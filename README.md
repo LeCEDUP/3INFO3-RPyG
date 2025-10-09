@@ -29,7 +29,7 @@ Para solucionar estes exercícios, siga os passos abaixo para fazer um Pull Requ
 
 1.  **Clone o Repositório**: No seu terminal, clone o repositório para a sua máquina local:
     ```bash
-    git clone https://github.com/LeCEDUP/RPyG.git
+    git clone https://github.com/LeCEDUP/3INFO3-RPyG.git
     ```
 
 2.  **Crie uma Nova Branch**: Navegue até o diretório do projeto e crie uma nova branch para suas alterações:

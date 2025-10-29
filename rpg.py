@@ -148,7 +148,7 @@ def escolher_classe():
     elif escolha == "2":
         return "Mago", 80, 20, 5
     elif escolha == "3":
-        return "Ladino", 90, 18, 7
+        return "Ladino", 90, 18, 8
     else:
         print("Opção inválida! Você será um Guerreiro.")
         return "Guerreiro", 100, 15, 10
@@ -311,7 +311,7 @@ def carregar_jogo(filename="savegame.json"):
         return None
 
 def main():
-    print("=== RPG SIMPLES EM PYTHON ===")
+    print("=== RPG SIMPLES ===")
     heroi = None
 
     while True:
@@ -334,19 +334,21 @@ def main():
                 heroi.adicionar_ao_inventario(Item("Poção de Cura Menor", "Restaura 20 de HP."))
             elif heroi.classe == "Ladino":
                 heroi.adicionar_ao_inventario(Arma("Adaga Afiada", "Uma adaga rápida e letal.", 6))
-                heroi.adicionar_ao_inventario(Item("Poção de Agilidade", "Aumenta temporariamente a velocidade."))
+                heroi.adicionar_ao_inventario(Item("Cura Média", "Restaura 50 de HP."))
             
             # Define os itens iniciais para cada classe
             initial_items = []
             if heroi.classe == "Guerreiro":
                 initial_items.append(Arma("Espada Curta", "Uma espada simples, mas eficaz.", 5))
-                initial_items.append(Armadura("Armadura de Couro", "Uma armadura leve.", 2))
+                initial_items.append(Armadura("Armadura de Couro", "Uma armadura leve.", 3))
                 initial_items.append(Item("Poção de Cura Menor", "Restaura 20 de HP."))
             elif heroi.classe == "Mago":
                 initial_items.append(Arma("Cajado de Aprendiz", "Um cajado para iniciantes.", 7))
+                initial_items.append(Armadura("Chapél de pano", "Um chapel simples", 1))
                 initial_items.append(Item("Poção de Cura Média", "Restaura 50 de HP."))
             elif heroi.classe == "Ladino":
                 initial_items.append(Arma("Adaga Afiada", "Uma adaga rápida e letal.", 6))
+                initial_items.append(Armadura("Manto de seda", "Uma capa leve", 1))
                 initial_items.append(Item("Poção de Agilidade", "Aumenta temporariamente a velocidade."))
             
             # Adiciona e equipa os itens iniciais
@@ -380,11 +382,13 @@ def main():
         return
 
     # Inimigo fixo para teste
-    inimigo1 = Monstro("Goblin", 50, 10, 5, "Pequeno")
-    inimigo2 = Monstro("Orc", 80, 15, 8, "Grande")
-    inimigo3 = Monstro("Dragão Jovem", 150, 25, 12, "Chefe")
+    inimigo1 = Monstro("Lobo", 40, 8, 5, "Pequeno")
+    inimigo2 = Monstro("Goblin", 60, 11, 7, "Grande")
+    inimigo3 = Monstro("Aranha", 70, 13, 8, "Grande")
+    inimigo4 = Monstro("Orc", 80, 15, 8, "Grande")
+    inimigo5 = Monstro("Dragão Jovem", 150, 25, 12, "Chefe")
 
-    inimigos = [inimigo1, inimigo2, inimigo3]
+    inimigos = [inimigo1, inimigo2, inimigo3, inimigo4, inimigo5]
     
     for i, inimigo in enumerate(inimigos):
         if heroi.esta_vivo():

@@ -1,3 +1,5 @@
+from personagens.heroi import Heroi
+
 def mostrar_menu():
     print("Menu Principal")
     print("--------------")
@@ -11,6 +13,8 @@ print("finge que aqui tem uma intro")
 print("-----------------")
 nome_do_heroi = input("Insira um nome para o seu Herói: ")
 print("-----------------")
+
+meu_heroi = Heroi(nome_do_heroi, 100, 20, 10)
 
 mostrar_menu()
 escolha = input('Insira uma Opção')

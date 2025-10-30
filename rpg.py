@@ -8,6 +8,49 @@ class Personagem:
         self.vida_max = vida
         self.ataque = ataque
         self.defesa = defesa
+        self.status_effects = []
+
+    def adicionar_status(self, efeito):
+        """Adiciona um novo efeito ou renova um existente."""
+        # Se já tiver o efeito, você pode optar por renovar a duração
+        for s in self.status_effects:
+            if s.nome == efeito.nome:
+                s.duracao_restante = efeito.duracao_restante # Renovando
+                return f"{self.nome} já estava sob efeito de {efeito.nome}. Duração renovada."
+        
+        self.status_effects.append(efeito)
+        return f"{self.nome} agora está sob efeito de {efeito.nome}!"
+
+    def processar_efeitos_de_status(self):
+        """Chamado no início de cada turno."""
+        mensagens = []
+        efeitos_a_remover = []
+
+        for efeito in self.status_effects:
+            # Aplica o dano/efeito do status
+            mensagem_dano = efeito.aplicar_efeito(self)
+            
+            if mensagem_dano:
+                mensagens.append(mensagem_dano)
+            
+            # Verifica se o efeito terminou
+            if efeito.duracao_restante <= 0:
+                efeitos_a_remover.append(efeito)
+                mensagens.append(f"O efeito de {efeito.nome} em {self.nome} terminou.")
+
+        # Remove os efeitos terminados
+        for efeito in efeitos_a_remover:
+            self.status_effects.remove(efeito)
+            
+        return mensagens
+        
+    def esta_vivo(self):
+        return self.vida > 0
+
+    def get_status_info(self):
+        if not self.status_effects:
+            return "Nenhum status ativo."
+        return "Ativo: " + ", ".join([str(s) for s in self.status_effects])
 
     def atacar(self, alvo):
         dano = max(0, self.ataque - alvo.defesa)
@@ -32,11 +75,70 @@ class Arma(Item):
         super().__init__(nome, descricao)
         self.bonus_ataque = bonus_ataque
 
+# --- CLASSES DE STATUS (NOVAS) ---
+class StatusEffect:
+    def __init__(self, nome, duracao, dano_por_turno, tipo):
+        self.nome = nome
+        self.duracao_restante = duracao
+        self.dano_por_turno = dano_por_turno
+        self.tipo = tipo # Para fácil identificação
+
+    def aplicar_efeito(self, alvo):
+        """Aplica o dano/efeito do status no alvo."""
+        if self.duracao_restante > 0:
+            dano = self.dano_por_turno
+            alvo.vida -= dano
+            self.duracao_restante -= 1
+            return f"{alvo.nome} sofre {dano} de dano por {self.nome}."
+        return None # Efeito não aplicado (durou 0 ou foi removido)
+
+    def __str__(self):
+        return f"{self.nome} (Dano: {self.dano_por_turno}, Turnos: {self.duracao_restante})"
+
+class Sangramento(StatusEffect):
+    def __init__(self, duracao=4, dano_base=5):
+        # Sangramento: Dano físico por turno.
+        super().__init__("Sangramento", duracao, dano_base, "Dano por Turno")
+
+class Queimadura(StatusEffect):
+    def __init__(self, duracao=3, dano_base=7):
+        # Queimadura: Dano maior por turno.
+        super().__init__("Queimadura", duracao, dano_base, "Dano por Turno")
+        
+class Envenenamento(StatusEffect):
+    def __init__(self, duracao=5, dano_base=3):
+        # Envenenamento: Dano menor, mas mais duradouro.
+        super().__init__("Envenenamento", duracao, dano_base, "Dano por Turno")
+
+# --- FIM DAS CLASSES DE STATUS ---
+
 class Armadura(Item):
     def __init__(self, nome, descricao, bonus_defesa):
         super().__init__(nome, descricao)
         self.bonus_defesa = bonus_defesa
+        
+class Antidoto(Item):
+    def __init__(self):
+        super().__init__("Poção de Antídoto", "Remove efeitos de Envenenamento e Sangramento/Queimadura leves.")
+        
+    def usar(self, heroi):
+        removidos = []
+        
+        # Cria uma lista de status para remover
+        efeitos_a_remover = [
+            s for s in heroi.status_effects 
+            if isinstance(s, Envenenamento) or isinstance(s, Sangramento) or isinstance(s, Queimadura)
+        ]
 
+        if not efeitos_a_remover:
+            return f"{heroi.nome} usou a Poção de Antídoto, mas não havia status negativos para remover."
+            
+        for efeito in efeitos_a_remover:
+            heroi.status_effects.remove(efeito)
+            removidos.append(efeito.nome)
+
+        return f"{heroi.nome} usou a Poção de Antídoto! Status removidos: {', '.join(removidos)}. Sentindo-se melhor!"
+    
 class Heroi(Personagem):
     def __init__(self, nome, vida, ataque, defesa, classe):
         super().__init__(nome, vida, ataque, defesa)
@@ -161,7 +263,6 @@ def menu_acao(heroi):
     print("4 - Ver Inventário")
     print("5 - Fugir")
     return input("Escolha: ")
-
 
 def combate(heroi, inimigo):
     cura_usada = False

@@ -1,45 +1,45 @@
 {
     "nome": "Marlon",
-    "classe": "Guerreiro",
-    "vida": 50,
-    "vida_max": 120,
-    "ataque": 25,
-    "defesa": 15,
+    "classe": "Ladino",
+    "vida": 110,
+    "vida_max": 110,
+    "ataque": 29,
+    "defesa": 12,
     "nivel": 2,
-    "experiencia": 100,
+    "experiencia": 25,
     "inventario": [
         {
-            "nome": "Espada Curta",
-            "descricao": "Uma espada simples, mas eficaz.",
-            "bonus_ataque": 5,
+            "nome": "Adaga Afiada",
+            "descricao": "Uma adaga r\u00e1pida e letal.",
+            "bonus_ataque": 6,
             "bonus_defesa": null,
             "tipo": "Arma"
         },
         {
-            "nome": "Armadura de Couro",
-            "descricao": "Uma armadura leve.",
+            "nome": "Cura M\u00e9dia",
+            "descricao": "Restaura 50 de HP.",
             "bonus_ataque": null,
-            "bonus_defesa": 2,
-            "tipo": "Armadura"
+            "bonus_defesa": null,
+            "tipo": "Item"
         },
         {
-            "nome": "Po\u00e7\u00e3o de Cura Menor",
-            "descricao": "Restaura 20 de HP.",
+            "nome": "Po\u00e7\u00e3o de Agilidade",
+            "descricao": "Aumenta temporariamente a velocidade.",
             "bonus_ataque": null,
             "bonus_defesa": null,
             "tipo": "Item"
         }
     ],
     "arma_equipada": {
-        "nome": "Espada Curta",
-        "descricao": "Uma espada simples, mas eficaz.",
-        "bonus_ataque": 5,
+        "nome": "Adaga Afiada",
+        "descricao": "Uma adaga r\u00e1pida e letal.",
+        "bonus_ataque": 6,
         "tipo": "Arma"
     },
     "armadura_equipada": {
-        "nome": "Armadura de Couro",
-        "descricao": "Uma armadura leve.",
-        "bonus_defesa": 2,
+        "nome": "Manto de seda",
+        "descricao": "Uma capa leve",
+        "bonus_defesa": 1,
         "tipo": "Armadura"
     }
 }

@@ -265,13 +265,34 @@ def menu_acao(heroi):
     return input("Escolha: ")
 
 def combate(heroi, inimigo):
-    cura_usada = False
+    import random # Necessário para o teste de Envenenamento do Inimigo
+
     print(f"\n!!! {heroi.nome} o {heroi.classe} entra em batalha contra um {inimigo.nome} ({inimigo.tipo}) !!!")
 
     while heroi.esta_vivo() and inimigo.esta_vivo():
         linha()
-        print(f"HP de {heroi.nome}: {heroi.vida}/{heroi.vida_max} | HP do {inimigo.nome}: {inimigo.vida}/{inimigo.vida_max}")
+        
+        # Exibir status do herói e inimigo
+        heroi_status_info = ", ".join([str(s) for s in heroi.status_effects])
+        inimigo_status_info = ", ".join([str(s) for s in inimigo.status_effects])
+
+        print(f"HP de {heroi.nome}: {heroi.vida}/{heroi.vida_max} ({heroi_status_info if heroi_status_info else 'OK'})")
+        print(f"HP do {inimigo.nome}: {inimigo.vida}/{inimigo.vida_max} ({inimigo_status_info if inimigo_status_info else 'OK'})")
         print(f"Ataque: {heroi.ataque} | Defesa: {heroi.defesa}")
+
+        # PROCESSAR STATUS NO INÍCIO DO TURNO DO JOGADOR
+        print("\n--- Efeitos de Status ---")
+        mensagens_heroi = heroi.processar_efeitos_de_status()
+        for msg in mensagens_heroi:
+            print(f"[HERÓI] {msg}")
+        
+        mensagens_inimigo = inimigo.processar_efeitos_de_status()
+        for msg in mensagens_inimigo:
+            print(f"[INIMIGO] {msg}")
+        print("--------------------------")
+        
+        if not heroi.esta_vivo() or not inimigo.esta_vivo(): # Verifica se morreram com o dano do status
+            break
 
         acao = menu_acao(heroi)
 
@@ -279,47 +300,57 @@ def combate(heroi, inimigo):
             dano_causado = heroi.atacar(inimigo)
             print(f"Você atacou com sua {heroi.arma_equipada.nome if heroi.arma_equipada else 'mãos'} e causou {dano_causado} de dano em {inimigo.nome}!")
 
-        elif acao == "2":  # habilidade especial (simplificada)
+        elif acao == "2":  # habilidade especial (MODIFICADA para aplicar status)
             dano_extra = 0
             if heroi.classe == "Guerreiro":
                 dano_extra = 8
                 print("Você usou Golpe Poderoso!")
+                # Aplica Sangramento garantido (Guerreiro)
+                resultado_status = inimigo.adicionar_status(Sangramento(duracao=2, dano_base=5))
+                print(resultado_status)
             elif heroi.classe == "Mago":
                 dano_extra = 10
                 print("Você lançou uma Bola de Fogo!")
+                # Aplica Queimadura garantida (Mago)
+                resultado_status = inimigo.adicionar_status(Queimadura(duracao=3, dano_base=7))
+                print(resultado_status)
             elif heroi.classe == "Ladino":
                 dano_extra = 6
                 print("Você aplicou um Golpe Rápido e preciso!")
+                # Aplica Envenenamento garantido (Ladino)
+                resultado_status = inimigo.adicionar_status(Envenenamento(duracao=4, dano_base=3))
+                print(resultado_status)
             
             dano_habilidade = max(0, (heroi.ataque + dano_extra) - inimigo.defesa)
             inimigo.receber_dano(dano_habilidade)
             print(f"O inimigo recebeu {dano_habilidade} de dano da sua habilidade!")
 
         elif acao == "3": # Usar Item
-            if not heroi.inventario:
-                print("Seu inventário está vazio!")
-                continue
-            print("Itens no seu inventário:")
-            for i, item in enumerate(heroi.inventario):
-                print(f"{i+1}. {item.nome} - {item.descricao}")
-            item_escolhido = input("Digite o nome do item que deseja usar (ou 'cancelar'): ")
-            if item_escolhido.lower() == 'cancelar':
-                continue
-            heroi.usar_item(item_escolhido)
+             if not heroi.inventario:
+                 print("Seu inventário está vazio!")
+                 continue
+             print("Itens no seu inventário:")
+             for i, item in enumerate(heroi.inventario):
+                 print(f"{i+1}. {item.nome} - {item.descricao}")
+             item_escolhido = input("Digite o nome do item que deseja usar (ou 'cancelar'): ")
+             if item_escolhido.lower() == 'cancelar':
+                 continue
+             heroi.usar_item(item_escolhido)
 
         elif acao == "4": # Ver Inventário
-            if not heroi.inventario:
-                print("Seu inventário está vazio.")
-            else:
-                print("--- Inventário ---")
-                for item in heroi.inventario:
-                    print(f"- {item.nome}: {item.descricao}")
-                if heroi.arma_equipada:
-                    print(f"Arma Equipada: {heroi.arma_equipada.nome} (Ataque +{heroi.arma_equipada.bonus_ataque})")
-                if heroi.armadura_equipada:
-                    print(f"Armadura Equipada: {heroi.armadura_equipada.nome} (Defesa +{heroi.armadura_equipada.bonus_defesa})")
-                print("------------------")
-            continue # Não consome turno
+             # Código do Inventário não modificado, continua o mesmo.
+             if not heroi.inventario:
+                 print("Seu inventário está vazio.")
+             else:
+                 print("--- Inventário ---")
+                 for item in heroi.inventario:
+                     print(f"- {item.nome}: {item.descricao}")
+                 if heroi.arma_equipada:
+                     print(f"Arma Equipada: {heroi.arma_equipada.nome} (Ataque +{heroi.arma_equipada.bonus_ataque})")
+                 if heroi.armadura_equipada:
+                     print(f"Armadura Equipada: {heroi.armadura_equipada.nome} (Defesa +{heroi.armadura_equipada.bonus_defesa})")
+                 print("------------------")
+             continue # Não consome turno
 
         elif acao == "5":
             print("Você fugiu da batalha!")
@@ -333,13 +364,24 @@ def combate(heroi, inimigo):
         if inimigo.esta_vivo():
             dano_inimigo_causado = inimigo.atacar(heroi)
             print(f"O {inimigo.nome} atacou e causou {dano_inimigo_causado} de dano em {heroi.nome}!")
+            
+            # NOVO: Inimigo pode aplicar status (ex: 20% de chance de envenenar)
+            if inimigo.tipo == "Aranha" and random.random() < 0.4:
+                resultado_status = heroi.adicionar_status(Envenenamento(duracao=3, dano_base=3))
+                print(f"[INIMIGO AÇÃO] {resultado_status}")
+            
+            # Exemplo: Orc pode causar sangramento
+            elif inimigo.tipo == "Grande" and random.random() < 0.2:
+                resultado_status = heroi.adicionar_status(Sangramento(duracao=2, dano_base=4))
+                print(f"[INIMIGO AÇÃO] {resultado_status}")
+
 
     if not heroi.esta_vivo():
         print("Você foi derrotado!")
         return False
     else:
         print(f"Você derrotou o {inimigo.nome}!")
-        heroi.ganhar_experiencia(inimigo.vida_max // 2) # Ganha XP baseado na vida do monstro
+        heroi.ganhar_experiencia(inimigo.vida_max // 2) 
         return True
 
 def salvar_jogo(heroi, filename="savegame.json"):
@@ -450,7 +492,7 @@ def main():
             elif heroi.classe == "Ladino":
                 initial_items.append(Arma("Adaga Afiada", "Uma adaga rápida e letal.", 6))
                 initial_items.append(Armadura("Manto de seda", "Uma capa leve", 1))
-                initial_items.append(Item("Poção de Agilidade", "Aumenta temporariamente a velocidade."))
+                initial_items.append(Item("Poção de Cura Média", "Restaura 50 de HP."))
             
             # Adiciona e equipa os itens iniciais
             for item in initial_items:

@@ -1,4 +1,5 @@
 from personagens.heroi import Heroi
+from personagens.monstro import Monstro
 
 def mostrar_menu():
     print("Menu Principal")
@@ -15,6 +16,7 @@ nome_do_heroi = input("Insira um nome para o seu Herói: ")
 print("-----------------")
 
 meu_heroi = Heroi(nome_do_heroi, 100, 20, 10)
+goblin = Monstro('Boleto', 150, 15, 10)
 
 mostrar_menu()
 escolha = input('Insira uma Opção')

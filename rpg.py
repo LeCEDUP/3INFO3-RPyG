@@ -488,4 +488,7 @@ class SistemaJogo:
         """Placeholder para modo infinito - será implementado na próxima fase"""
         print("\n♾️ Modo Infinito será implementado...")
         self.pausar()
+        if __name__ == "__main__":
+    jogo = SistemaJogo()
+    jogo.menu_principal()
 

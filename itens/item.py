@@ -19,7 +19,7 @@ class Item:
     def from_dict(cls, data):
         if data is None:
             return None
-        return cls(data["nome"], data["preco"], data["descricao"])´
+        return cls(data["nome"], data["preco"], data["descricao"])
     
 class Consumivel(Item):
     def __init__(self, nome, preco, descricao, efeito_pv=0, efeito_vigor=0, remove_condicao=None):

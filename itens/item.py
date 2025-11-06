@@ -42,7 +42,7 @@ class Consumivel(Item):
 
         if self.remove_condicao and self.remove_condicao in alvo.condicoes:
             del alvo.condicoes[self.remove_condicao]
-            print(f"{Fore.GREEN}🩹 {alvo.nome} usou {self.nome} e removeu a condição {self.remove_condicao}.{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} {alvo.nome} usou {self.nome} e removeu a condição {self.remove_condicao}.{Style.RESET_ALL}")
             usado = True
         
         return usado

@@ -4,6 +4,10 @@ import sys
 import json
 import os
 from colorama import Fore, Style, init
+from .item import Item
+from .personagem import Personagem
+from itens.arma import Arma
+from itens.armadura import Armadura
 
 init(autoreset=True)
 

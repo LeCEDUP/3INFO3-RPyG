@@ -24,3 +24,5 @@ if escolha == '1':
     print("Exemplo história")
 elif escolha == '2':
     print("Exemplo Infinito")
+
+# TESTANDO O PYCHARM

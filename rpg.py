@@ -1,17 +1,3 @@
-
-
-
-class Monstro(Personagem):
-    def __init__(self, nome, vida_base, ataque_base, defesa_base, tipo="Tropa"):
-        super().__init__(nome, vida_base, ataque_base, defesa_base)
-        self.tipo = tipo
-
-    def atacar(self, alvo):
-        dano_bruto = self.ataque
-        print(f"[{self.nome}] ({self.tipo}) ataca [{alvo.nome}].")
-        alvo.receber_dano(dano_bruto, tipo_dano="fisico")
-
-
 ITENS_DO_JOGO = {
     "espada_longa": Arma("Espada Longa", "Aumenta o dano de ataque.", 350, bonus_ataque=10),
     "gume_do_infinito": Arma("Gume do Infinito", "Item lendário de dano de ataque.", 3400, bonus_ataque=70),

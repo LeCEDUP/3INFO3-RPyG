@@ -1,3 +1,4 @@
+from mapa.locais import ITENS_LOJA
 from .personagem import Personagem
 from itens.arma import Arma
 from itens.armadura import Armadura
@@ -35,3 +36,34 @@ class Heroi(Personagem):
                 print(f"{item.nome} não pode ser equipado.")
         else:
             print(f"{self.nome} não possui {item.nome} no inventário.")
+
+
+def criar_novo_heroi():
+    print(f"\n{Fore.YELLOW}--- CRIAÇÃO DE PERSONAGEM ---{Style.RESET_ALL}")
+    nome = input("Digite o nome do seu Herói: ")
+    
+    subclasses = {
+        1: "Mestre do Punho",
+        2: "Tanque de Ferro",
+        3: "Vento Veloz"
+    }
+    
+    while True:
+        print("\nEscolha sua Subclasse:")
+        print("1. Mestre do Punho (Equilibrado, Foco em Dano)")
+        print("2. Tanque de Ferro (Alto PV/Defesa, Foco em Sobrevivência)")
+        print("3. Vento Veloz (Alto Vigor/Velocidade, Foco em Agilidade)")
+        
+        escolha = input("Opção: ")
+        if escolha.isdigit() and int(escolha) in subclasses:
+            subclasse = subclasses[int(escolha)]
+            break
+        else:
+            print("Escolha inválida.")
+            
+    heroi = GuerreiroDoPunho(nome, subclasse)
+    heroi.escolher_talento()
+    
+    save_game(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+    
+    return heroi

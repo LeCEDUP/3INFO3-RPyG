@@ -1,0 +1,62 @@
+SAVE_FILE = "rpg_save_data.json"
+
+def save_game(heroi, config_data):
+    """Salva o estado do jogo (herói e configurações) em um arquivo JSON."""
+    try:
+        heroi_data = heroi.to_dict()
+        
+        full_data = {
+            "heroi": heroi_data,
+            "config": config_data
+        }
+        
+        with open(SAVE_FILE, 'w', encoding='utf-8') as f:
+            json.dump(full_data, f, indent=4, ensure_ascii=False)
+        
+        print(f"\n{Fore.GREEN}*** Jogo salvo automaticamente em '{SAVE_FILE}'! ***{Style.RESET_ALL}")
+    except Exception as e:
+        print(f"{Fore.RED}ERRO ao salvar o jogo: {e}{Style.RESET_ALL}")
+
+def load_game():
+    """Carrega o estado do jogo a partir do arquivo JSON."""
+    if not os.path.exists(SAVE_FILE):
+        return None, None
+
+    try:
+        with open(SAVE_FILE, 'r', encoding='utf-8') as f:
+            full_data = json.load(f)
+        
+        config_data = full_data.get("config", {})
+        
+        heroi_data = full_data.get("heroi")
+        if heroi_data:
+            heroi = GuerreiroDoPunho.from_dict(heroi_data)
+        else:
+            heroi = None
+
+        print(f"\n{Fore.GREEN}*** Jogo carregado com sucesso de '{SAVE_FILE}'! ***{Style.RESET_ALL}")
+        return heroi, config_data
+    except Exception as e:
+        print(f"{Fore.RED}ERRO ao carregar o jogo: Arquivo corrompido ou formato inválido. Iniciando novo jogo. ({e}){Style.RESET_ALL}")
+        return None, None
+
+def deserialize_object(data):
+    """Função auxiliar para desserializar objetos com base na chave __class__."""
+    if data is None:
+        return None
+    
+    class_name = data.get("__class__")
+    if class_name in CLASS_MAP:
+        cls = CLASS_MAP[class_name]
+        if class_name in ["Luva", "Quimono", "Acessorio"]:
+            return cls.from_dict(data)
+        elif class_name == "Equipamento":
+            return cls.from_dict(data)
+        elif class_name == "Consumivel":
+            return cls.from_dict(data)
+        elif class_name == "Habilidade":
+            return cls.from_dict(data)
+        else:
+            return cls.from_dict(data)
+
+    return data

@@ -1,4 +1,18 @@
-# Desenvolva o seu jogo aqui
+# Desenvolva o seu jogo 
+from personagens.personagem import Personagem
+from itens.item import Item
+from itens.arma import Arma
+from itens.armadura import Armadura
+from itens.pocao import Pocao
+from personagens.monstro import Monstro
+from personagens.heroi import Heroi
+import random
+import json
+import os
+from typing import List, Optional
+
+
+
 class SistemaJogo:
     """Gerencia o fluxo do jogo"""
     
@@ -488,7 +502,6 @@ class SistemaJogo:
         """Placeholder para modo infinito - será implementado na próxima fase"""
         print("\n♾️ Modo Infinito será implementado...")
         self.pausar()
-        if __name__ == "__main__":
-    jogo = SistemaJogo()
-    jogo.menu_principal()
 
+jogo = SistemaJogo()
+jogo.menu_principal()

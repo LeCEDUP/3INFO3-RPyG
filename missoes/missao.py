@@ -32,3 +32,9 @@ class Missao:
             data["alvo"], data["quantidade"], data["progresso"], 
             data["gold_recompensa"], data["exp_recompensa"]
         )
+    
+MISSOES_DISPONIVEIS = [
+    Missao("CAÇA_LUTADORES", "Derrote 5 Lutadores no Dojo.", "derrotar_monstro", "Lutador", "Lutador", 5, 0, 50, 100),
+    Missao("CAÇA_MESTRES", "Derrote 3 Mestres no Dojo.", "derrotar_monstro", "Mestre", "Mestre", 3, 0, 100, 250),
+    Missao("CAÇA_DESAFIANTES", "Derrote 2 Desafiantes no Dojo.", "derrotar_monstro", "Desafiante", "Desafiante", 2, 0, 150, 400)
+]

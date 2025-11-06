@@ -1,22 +1,30 @@
 class Personagem:
-    def __init__(self, nome, vida, ataque, defesa):
+    """Classe base para todos os personagens do jogo"""
+    
+    def __init__(self, nome: str, vida: int, ataque: int, defesa: int):
         self.nome = nome
         self.vida = vida
+        self.vida_maxima = vida
         self.ataque = ataque
         self.defesa = defesa
-
-    def atacar(self, alvo):
-        dano = max(0, self.ataque - alvo.defesa)
+    
+    def atacar(self, alvo: 'Personagem') -> int:
+        """Calcula o dano e aplica ao alvo"""
+        dano = max(0, self.ataque - alvo.defesa + random.randint(-3, 3))
         alvo.receber_dano(dano)
-        print(f"{self.nome} atacou {alvo.nome} causando {dano} de dano.")
-
-    def receber_dano(self, dano):
+        return dano
+    
+    def receber_dano(self, dano: int):
+        """Reduz a vida do personagem"""
         self.vida -= dano
-        if self.vida <= 0:
+        if self.vida < 0:
             self.vida = 0
-            print(f"{self.nome} foi derrotado!")
-        else:
-            print(f"{self.nome} recebeu {dano} de dano. Vida restante: {self.vida}")
-
-    def esta_vivo(self):
+    
+    def esta_vivo(self) -> bool:
+        """Retorna True se a vida for maior que 0"""
         return self.vida > 0
+    
+    def curar(self, quantidade: int):
+        """Cura o personagem"""
+        self.vida = min(self.vida + quantidade, self.vida_maxima)
+

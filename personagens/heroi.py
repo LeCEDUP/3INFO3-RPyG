@@ -1,7 +1,17 @@
 from mapa.locais import ITENS_LOJA
-from .personagem import Personagem
-from itens.arma import Arma
-from itens.armadura import Armadura
+from missoes.missao import MISSOES_DISPONIVEIS
+from personagens.monstro import OPONENTE_MODELOS
+from .personagem import GuerreiroDoPunho, Personagem
+import itens
+import inventario
+import random
+import json
+import os
+import savegame
+import sys  
+import colorama
+from colorama import Fore, Style
+colorama.init(autoreset=True)
 
 class Heroi(Personagem):
     def __init__(self, nome, vida, ataque, defesa, nivel=1, experiencia=0, inventario=None):
@@ -26,10 +36,10 @@ class Heroi(Personagem):
 
     def equipar_item(self, item):
         if item in self.inventario:
-            if isinstance(item, Arma):
+            if isinstance(item, 'luva','quimono','acessorio'):
                 self.ataque += item.bonus_ataque
                 print(f"{self.nome} equipou {item.nome}. Ataque atual: {self.ataque}")
-            elif isinstance(item, Armadura):
+            elif isinstance(item, 'luva','quimono','acessorio'):
                 self.defesa += item.bonus_defesa
                 print(f"{self.nome} equipou {item.nome}. Defesa atual: {self.defesa}")
             else:
@@ -64,6 +74,6 @@ def criar_novo_heroi():
     heroi = GuerreiroDoPunho(nome, subclasse)
     heroi.escolher_talento()
     
-    save_game(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+    savegame(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
     
     return heroi

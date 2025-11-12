@@ -1,3 +1,18 @@
+from missoes.missao import OPONENTE_MODELOS, MISSOES_DISPONIVEIS, ITENS_LOJA
+import importlib
+import savegame
+import personagens
+import habilidade
+import karma
+import mapa
+import missoes
+import torneio
+import itens
+import inventario
+import menu
+import random
+from colorama import Fore, Style
+
 def menu_treinamento(heroi):
     while True:
         print(f"\n{Fore.YELLOW}--- TREINAMENTO ---{Style.RESET_ALL}")
@@ -9,7 +24,7 @@ def menu_treinamento(heroi):
         escolha = input("Escolha a opção: ")
         
         if escolha == '0':
-            save_game(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+            savegame(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
             break
         
         elif escolha == '1':

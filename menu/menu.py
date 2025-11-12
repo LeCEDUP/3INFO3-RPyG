@@ -1,3 +1,24 @@
+
+from inventario.inventario import menu_inventario
+from karma.karma import mostrar_status
+from mapa.locais import ITENS_LOJA, menu_dojo, menu_lojas
+from missoes.missao import MISSOES_DISPONIVEIS
+from personagens.monstro import OPONENTE_MODELOS
+import torneio
+import rpg
+import personagens
+import savegame
+import mapa
+import karma
+from torneio.torneio import iniciar_torneio
+import treinamento
+
+from personagens import Missao
+import random
+from colorama import Fore, Style
+
+from treinamento.treinamento import menu_treinamento
+
 def menu_jogo(heroi):
     print("\n" + Fore.YELLOW + "="*50)
     print(f" CIDADE DE KAIRU - DOJO CENTRAL")
@@ -12,7 +33,7 @@ def menu_jogo(heroi):
     while heroi.esta_vivo():
 
         if heroi.missao_ativa and heroi.missao_ativa.progresso >= heroi.missao_ativa.quantidade:
-            print(f"\n{Fore.YELLOW}🏆 MISSÃO COMPLETA: {heroi.missao_ativa.nome}!{Style.RESET_ALL}")
+            print(f"\n{Fore.YELLOW} MISSÃO COMPLETA: {heroi.missao_ativa.nome}!{Style.RESET_ALL}")
             heroi.gold += heroi.missao_ativa.gold_recompensa
             heroi.ganhar_experiencia(heroi.missao_ativa.exp_recompensa)
             heroi.missoes_completas.append(heroi.missao_ativa.id)
@@ -34,7 +55,7 @@ def menu_jogo(heroi):
                 heroi.karma = min(100, heroi.karma + 5)
                 print(f"{Fore.GREEN}O monge sorri e se curva em respeito. Karma: {heroi.karma}{Style.RESET_ALL}")
             
-            save_game(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+            savegame(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
 
         print(f"\n{Fore.CYAN}--- MENU PRINCIPAL ---{Style.RESET_ALL}")
         print(f"PV: {Fore.RED}{heroi.vida}/{heroi.vida_max}{Style.RESET_ALL} | Vigor: {Fore.BLUE}{heroi.vigor}/{heroi.vigor_max}{Style.RESET_ALL} | Gold: {Fore.YELLOW}{heroi.gold}{Style.RESET_ALL}")
@@ -65,10 +86,10 @@ def menu_jogo(heroi):
         elif escolha == '6':
             iniciar_torneio(heroi)
         elif escolha == '7':
-            save_game(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+            savegame(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
         elif escolha == '0':
             print(f"\n{Fore.YELLOW}Salvando e saindo...{Style.RESET_ALL}")
-            save_game(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+            savegame(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
             break
         else:
             print("Opção inválida.")

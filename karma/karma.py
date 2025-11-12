@@ -1,3 +1,9 @@
+import rpg
+import personagens
+from colorama import Fore, Style, init
+
+init()
+
 def mostrar_status(heroi):
     print(f"\n{Fore.GREEN}--- STATUS DO HERÓI ---{Style.RESET_ALL}")
     print(f"Nome: {heroi.nome}")

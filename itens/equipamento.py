@@ -1,4 +1,7 @@
-class Equipamento(Item):
+from itens import item
+
+
+class Equipamento(item):
     def __init__(self, nome, preco, slot, bonus_ataque=0, bonus_defesa=0, bonus_velocidade=0, descricao="Um equipamento."):
         super().__init__(nome, preco, descricao)
         self.slot = slot

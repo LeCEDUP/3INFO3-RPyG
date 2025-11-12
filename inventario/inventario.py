@@ -1,3 +1,15 @@
+import os
+from colorama import Fore, Style, init
+import itens
+from itens.equipamento import equipamento
+from itens.item import Consumivel
+import personagens
+import sys
+import time
+import savegame
+
+init()
+
 def menu_inventario(heroi):
     while True:
         print(f"\n{Fore.YELLOW}--- INVENTÁRIO ---{Style.RESET_ALL}")
@@ -23,7 +35,7 @@ def menu_inventario(heroi):
             break
         
         elif escolha == 'E':
-            if not any(isinstance(item, Equipamento) for item in heroi.inventario):
+            if not any(isinstance(item, equipamento) for item in heroi.inventario):
                 print(f"{Fore.RED}Nenhum equipamento no inventário para equipar.{Style.RESET_ALL}")
                 continue
                 
@@ -35,7 +47,7 @@ def menu_inventario(heroi):
                     num = int(num)
                     if 1 <= num <= len(heroi.inventario):
                         item = heroi.inventario[num - 1]
-                        if isinstance(item, Equipamento):
+                        if isinstance(item, equipamento):
                             heroi.equipar_item(item)
                             break
                         else:
@@ -98,7 +110,7 @@ def menu_inventario(heroi):
             print(f"\nDetalhes do Item: {item.nome}")
             print(f"  Descrição: {item.descricao}")
             print(f"  Preço de Compra: {item.preco} Gold")
-            if isinstance(item, Equipamento):
+            if isinstance(item, equipamento):
                 print(f"  Slot: {item.slot.capitalize()}")
                 print(f"  Bônus Ataque: {item.bonus_ataque}")
                 print(f"  Bônus Defesa: {item.bonus_defesa}")

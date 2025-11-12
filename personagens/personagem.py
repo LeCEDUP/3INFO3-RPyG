@@ -1,3 +1,45 @@
+from ast import For
+import random
+import time
+import os
+import habilidade 
+from habilidade.habilidade import Habilidade
+import inventario
+import itens
+from itens.item import Consumivel, Item
+from mapa.locais import ITENS_LOJA
+import missoes
+import karma
+from missoes.missao import MISSOES_DISPONIVEIS, Missao
+from personagens.monstro import OPONENTE_MODELOS, OponenteIA
+from personagens.heroi import GuerreiroDoPunho
+import torneio
+import json
+import mapa
+import savegame
+import sys
+from colorama import Fore, Style, init
+
+from torneio.torneio import menu_combate
+init(autoreset=True)
+
+def deserialize_object(data):
+    if not data:
+        return None
+    class_name = data.get("__class__")
+    if class_name == "Habilidade":
+        return Habilidade.from_dict(data)
+    elif class_name == "Consumivel":
+        return Consumivel.from_dict(data)
+    elif class_name == "Missao":
+        return Missao.from_dict(data)
+    elif class_name == "Item":
+        return Item.from_dict(data)
+    elif class_name == "GuerreiroDoPunho":
+        return GuerreiroDoPunho.from_dict(data)
+    return data
+
+
 class Personagem:
     def __init__(self, nome, vida, vigor_max, ataque, defesa, velocidade, nivel=1):
         self.nome = nome
@@ -26,7 +68,7 @@ class Personagem:
     
     def atacar(self, alvo, habilidade=None):
         if 'Atordoado' in self.condicoes:
-            print(f"{Fore.YELLOW}{self.nome} está Atordoado e não pode agir!{Style.RESET_ALL}")
+            print(f"{For.YELLOW}{self.nome} está Atordoado e não pode agir!{Style.RESET_ALL}")
             return False
 
         if habilidade:
@@ -37,7 +79,7 @@ class Personagem:
                     custo_vigor_final = int(habilidade.custo_vigor * 0.9)
 
             if self.vigor < custo_vigor_final:
-                print(f"{Fore.RED}{self.nome} não tem Vigor suficiente para usar {habilidade.nome}!{Style.RESET_ALL}")
+                print(f"{For.RED}{self.nome} não tem Vigor suficiente para usar {habilidade.nome}!{Style.RESET_ALL}")
                 return False
 
             self.vigor -= custo_vigor_final
@@ -46,17 +88,17 @@ class Personagem:
             if isinstance(self, GuerreiroDoPunho):
                 if 'Atordoado' in alvo.condicoes:
                     self.karma = max(-100, self.karma - 5)
-                    print(f"{Fore.RED} {self.nome} atacou um alvo Atordoado. Karma reduzido para {self.karma}.{Style.RESET_ALL}")
+                    print(f"{For.RED} {self.nome} atacou um alvo Atordoado. Karma reduzido para {self.karma}.{Style.RESET_ALL}")
 
                 if self.talento == "Poder Focado":
                     dano_bruto += habilidade.dano_base * 0.1
 
-            print(f"{Fore.CYAN} {self.nome} usa {habilidade.nome}!{Style.RESET_ALL}")
+            print(f"{For.CYAN} {self.nome} usa {habilidade.nome}!{Style.RESET_ALL}")
         else:
             vigor_gerado = 5
             self.vigor = min(self.vigor_max, self.vigor + vigor_gerado)
             dano_bruto = self.get_ataque_total() * 0.75
-            print(f" {self.nome} desfere um {Fore.GREEN}Ataque Básico{Style.RESET_ALL} e gera {vigor_gerado} Vigor.")
+            print(f" {self.nome} desfere um {For.GREEN}Ataque Básico{Style.RESET_ALL} e gera {vigor_gerado} Vigor.")
 
         dano_final = max(1, int(dano_bruto - (alvo.get_defesa_total() * 0.5)))
         alvo.receber_dano(dano_final, self)
@@ -65,30 +107,30 @@ class Personagem:
     def receber_dano(self, dano, atacante):
         if 'Bloqueio de Guarda' in self.condicoes:
             dano = int(dano * 0.5)
-            print(f"{Fore.BLUE}Dano reduzido pela metade devido ao Bloqueio de Guarda!{Style.RESET_ALL}")
+            print(f"{For.BLUE}Dano reduzido pela metade devido ao Bloqueio de Guarda!{Style.RESET_ALL}")
 
         self.vida -= dano
-        print(f"{Fore.RED}{self.nome} recebeu {dano} de dano. Vida restante: {self.vida}/{self.vida_max}{Style.RESET_ALL}")
+        print(f"{For.RED}{self.nome} recebeu {dano} de dano. Vida restante: {self.vida}/{self.vida_max}{Style.RESET_ALL}")
         
         if isinstance(self, GuerreiroDoPunho) and self.esta_vivo():
             habilidade_contra = next((h for h in self.habilidades if h.nome == "Contra-Ataque"), None)
             if habilidade_contra and self.vigor >= habilidade_contra.custo_vigor and dano > 0 and random.random() < 0.5: 
                 self.vigor -= habilidade_contra.custo_vigor
                 dano_contra = habilidade_contra.dano_base + (self.get_ataque_total() * 0.75)
-                print(f"{Fore.YELLOW} {self.nome} REVIDA com Contra-Ataque!{Style.RESET_ALL}")
+                print(f"{For.YELLOW} {self.nome} REVIDA com Contra-Ataque!{Style.RESET_ALL}")
                 atacante.receber_dano(int(dano_contra), self)
                 
         if not self.esta_vivo():
-            print(f"{Fore.RED} {self.nome} foi derrotado!{Style.RESET_ALL}")
+            print(f"{For.RED} {self.nome} foi derrotado!{Style.RESET_ALL}")
 
     def aplicar_condicao(self, condicao, duracao):
         if isinstance(self, GuerreiroDoPunho) and self.talento == "Mente Clara" and condicao in ["Sangramento", "Veneno", "Queimadura"]:
             if random.random() < 0.5: 
-                print(f"{Fore.CYAN} {self.nome} resistiu à condição {condicao} devido ao Talento Mente Clara!{Style.RESET_ALL}")
+                print(f"{For.CYAN} {self.nome} resistiu à condição {condicao} devido ao Talento Mente Clara!{Style.RESET_ALL}")
                 return
 
         self.condicoes[condicao] = duracao
-        print(f"{Fore.YELLOW} {self.nome} agora está sob a condição: {condicao} por {duracao} turno(s).{Style.RESET_ALL}")
+        print(f"{For.YELLOW} {self.nome} agora está sob a condição: {condicao} por {duracao} turno(s).{Style.RESET_ALL}")
 
     def processar_condicoes(self):
         condicoes_para_remover = []
@@ -96,26 +138,26 @@ class Personagem:
             if condicao == 'Sangramento':
                 dano_sangramento = int(self.vida_max * 0.05)
                 self.vida -= dano_sangramento
-                print(f"{Fore.RED} {self.nome} sofre dano de Sangramento: {dano_sangramento}. Vida restante: {self.vida}/{self.vida_max}{Style.RESET_ALL}")
+                print(f"{For.RED} {self.nome} sofre dano de Sangramento: {dano_sangramento}. Vida restante: {self.vida}/{self.vida_max}{Style.RESET_ALL}")
                 if not self.esta_vivo():
                     break
             
             elif condicao == 'Veneno':
                 dano_veneno = int(self.vida_max * 0.03)
                 self.vida -= dano_veneno
-                print(f"{Fore.MAGENTA} {self.nome} sofre dano de Veneno: {dano_veneno}. Vida restante: {self.vida}/{self.vida_max}{Style.RESET_ALL}")
+                print(f"{For.MAGENTA} {self.nome} sofre dano de Veneno: {dano_veneno}. Vida restante: {self.vida}/{self.vida_max}{Style.RESET_ALL}")
                 if not self.esta_vivo():
                     break
             
             elif condicao == 'Queimadura':
                 dano_queimadura = int(self.vida_max * 0.04)
                 self.vida -= dano_queimadura
-                print(f"{Fore.RED} {self.nome} sofre dano de Queimadura: {dano_queimadura}. Vida restante: {self.vida}/{self.vida_max}{Style.RESET_ALL}")
+                print(f"{For.RED} {self.nome} sofre dano de Queimadura: {dano_queimadura}. Vida restante: {self.vida}/{self.vida_max}{Style.RESET_ALL}")
                 if not self.esta_vivo():
                     break
             
             elif condicao == 'Atordoado':
-                print(f"{Fore.YELLOW} {self.nome} está Atordoado e perde o turno.{Style.RESET_ALL}")
+                print(f"{For.YELLOW} {self.nome} está Atordoado e perde o turno.{Style.RESET_ALL}")
             
             elif condicao == 'Bloqueio de Guarda':
                 pass 
@@ -126,7 +168,7 @@ class Personagem:
 
         for condicao in condicoes_para_remover:
             del self.condicoes[condicao]
-            print(f"{Fore.GREEN} Condição {condicao} removida de {self.nome}.{Style.RESET_ALL}")
+            print(f"{For.GREEN} Condição {condicao} removida de {self.nome}.{Style.RESET_ALL}")
 
     def recuperar_vigor_turno(self):
         recuperacao = 10
@@ -134,7 +176,7 @@ class Personagem:
             recuperacao += 5
         
         self.vigor = min(self.vigor_max, self.vigor + recuperacao)
-        print(f"{Fore.BLUE} {self.nome} recuperou {recuperacao} Vigor. Vigor atual: {self.vigor}/{self.vigor_max}{Style.RESET_ALL}")
+        print(f"{For.BLUE} {self.nome} recuperou {recuperacao} Vigor. Vigor atual: {self.vigor}/{self.vigor_max}{Style.RESET_ALL}")
 
     def to_dict(self):
         return {
@@ -233,7 +275,7 @@ class GuerreiroDoPunho(Personagem):
             print(f"\n{Fore.YELLOW}*** PARABÉNS! VOCÊ SUBIU PARA O NÍVEL {self.nivel}! ***{Style.RESET_ALL}")
             print(f"Você ganhou 3 Pontos de Treinamento!")
             
-            save_game(self, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+            savegame(self, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
 
     def equipar_item(self, item):
         if item.slot in self.equipamento:
@@ -261,7 +303,7 @@ class GuerreiroDoPunho(Personagem):
                 if item.usar(self):
                     self.inventario.pop(indice)
                     if not hasattr(self, 'venceu'): 
-                        save_game(self, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+                        savegame(self, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
                     return True
                 else:
                     print(f"{Fore.RED}Não foi possível usar {item.nome} (sem efeito ou condição não presente).{Style.RESET_ALL}")
@@ -288,7 +330,7 @@ class GuerreiroDoPunho(Personagem):
             if escolha.isdigit() and int(escolha) in talentos:
                 self.talento = talentos[int(escolha)][0]
                 print(f"{Fore.GREEN}Talento {self.talento} escolhido!{Style.RESET_ALL}")
-                save_game(self, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+                savegame(self, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
                 break
             else:
                 print("Escolha inválida.")
@@ -490,10 +532,10 @@ def iniciar_combate(heroi, oponente):
                 print(f"{Fore.GREEN}Você demonstrou piedade. Karma aumentado para {heroi.karma}.{Style.RESET_ALL}")
 
         if not heroi.experiencia >= heroi.exp_para_proximo_nivel:
-            save_game(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+            savegame(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
 
         return True 
     else:
         print(f"\n{Fore.RED}DERROTA!{Style.RESET_ALL}")
-        save_game(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
+        savegame(heroi, {"OPONENTE_MODELOS": OPONENTE_MODELOS, "MISSOES_DISPONIVEIS": MISSOES_DISPONIVEIS, "ITENS_LOJA": ITENS_LOJA})
         return False

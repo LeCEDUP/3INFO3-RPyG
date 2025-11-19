@@ -1,5 +1,6 @@
 import random
 
+
 # ---------- Classes base de Personagem ----------
 
 class Personagem:
